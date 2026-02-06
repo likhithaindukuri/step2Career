@@ -28,7 +28,10 @@ public class GroqAIClient implements AIClient {
       """
       You are an ATS resume analysis engine.
       Follow all rules strictly.
-      Output ONLY valid JSON.
+      You must return ONLY valid JSON.
+      Do not include explanations.
+      Do not include markdown.
+      Do not include text outside JSON.
 
       Resume:
       %s
@@ -48,7 +51,7 @@ public class GroqAIClient implements AIClient {
             "role",
             "system",
             "content",
-            "You are an ATS analysis engine. Output JSON only."
+            "You are an ATS analysis engine. You must return ONLY valid JSON with the shape: {\"atsScore\": number, \"missingKeywords\": string[], \"matchedKeywords\": string[], \"improvementSuggestions\": string[], \"summary\": string}. Do not include any markdown or extra text."
           ),
           Map.of("role", "user", "content", prompt)
         ),

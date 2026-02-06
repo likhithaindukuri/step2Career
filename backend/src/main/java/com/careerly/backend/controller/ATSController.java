@@ -1,6 +1,7 @@
 package com.careerly.backend.controller;
 
 import com.careerly.backend.dto.ATSRequest;
+import com.careerly.backend.dto.ATSResponse;
 import com.careerly.backend.service.ATSAnalysisService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,7 +23,7 @@ public class ATSController {
   }
 
   @PostMapping("/analyze")
-  public Mono<String> analyzeATS(@Valid @RequestBody ATSRequest request) {
+  public Mono<ATSResponse> analyzeATS(@Valid @RequestBody ATSRequest request) {
     return atsAnalysisService.analyze(
       request.getResumeText(),
       request.getJobDescription()
