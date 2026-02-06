@@ -33,6 +33,15 @@ public class GroqAIClient implements AIClient {
       Do not include markdown.
       Do not include text outside JSON.
 
+      Scoring rules:
+      - atsScore is an integer from 0 to 100.
+      - atsScore should roughly reflect the ratio of matchedKeywords to all keywords (matchedKeywords + missingKeywords).
+      - Do not set atsScore to 0 if there are matchedKeywords, unless the resume is almost completely irrelevant.
+
+      Suggestions rules:
+      - If atsScore is 90 or above, focus improvementSuggestions on small polish (clarity, structure, achievements), not on missing core skills.
+      - Do not say the candidate is lacking a skill that appears in matchedKeywords.
+
       Resume:
       %s
 

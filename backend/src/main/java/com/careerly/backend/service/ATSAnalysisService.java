@@ -21,7 +21,9 @@ public class ATSAnalysisService {
   public Mono<ATSResponse> analyze(String resume, String jobDescription) {
     return aiClient
       .analyzeATS(resume, jobDescription)
-      .map(aiResponseParser::parseATSResponse);
+      .map(raw ->
+        aiResponseParser.parseATSResponse(raw, resume, jobDescription)
+      );
   }
 }
 

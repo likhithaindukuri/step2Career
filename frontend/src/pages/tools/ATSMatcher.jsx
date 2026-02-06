@@ -1,26 +1,32 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { analyzeATS } from "../../api/atsApi";
+import { analyzeATSWithFile } from "../../api/atsApi";
 import Loader from "../../components/Loader";
 
 const ATSMatcher = () => {
   const navigate = useNavigate();
-  const [resumeText, setResumeText] = useState("");
+  const [resumeFile, setResumeFile] = useState(null);
   const [jobDescription, setJobDescription] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAnalyze = async () => {
-    if (!resumeText.trim() || !jobDescription.trim()) {
-      alert("Please add both resume text and job description.");
+    if (!resumeFile || !jobDescription.trim()) {
+      setErrorMessage(
+        "Please upload your resume (PDF) and add the job description."
+      );
       return;
     }
 
+    setErrorMessage("");
     setLoading(true);
     try {
-      const data = await analyzeATS(resumeText, jobDescription);
+      const data = await analyzeATSWithFile(resumeFile, jobDescription);
       navigate("/tools/ats/result", { state: { atsResult: data } });
     } catch {
-      alert("Something went wrong while analyzing. Please try again.");
+      setErrorMessage(
+        "We could not analyze your resume right now. Please try again in a moment."
+      );
     } finally {
       setLoading(false);
     }
@@ -41,20 +47,22 @@ const ATSMatcher = () => {
           ATS Resume Matcher
         </h1>
         <p className="text-gray-600">
-          Paste your resume and the job description to see how an ATS system
-          might compare them and what you can improve.
+          Upload your resume PDF and paste the job description to see how an ATS
+          system might compare them and what you can improve.
         </p>
       </div>
       <div className="mb-8">
         <label className="mb-2 block font-medium text-gray-700">
-          Resume Text
+          Upload Resume (PDF)
         </label>
-        <textarea
-          rows="8"
-          value={resumeText}
-          onChange={(event) => setResumeText(event.target.value)}
-          placeholder="Paste your resume text here..."
-          className="w-full resize-none rounded-lg border p-3"
+        <input
+          type="file"
+          accept=".pdf"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            setResumeFile(file ?? null);
+          }}
+          className="w-full rounded-lg border p-3"
         />
       </div>
       <div className="mb-8">
@@ -76,6 +84,11 @@ const ATSMatcher = () => {
       >
         Analyze Resume
       </button>
+      {errorMessage && (
+        <p className="mt-3 text-center text-sm text-red-600">
+          {errorMessage}
+        </p>
+      )}
       <p className="mt-4 text-sm text-gray-500">
         We do not store your resume. Your data stays private.
       </p>

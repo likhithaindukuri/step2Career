@@ -1,11 +1,25 @@
-const KeywordList = ({ title, keywords, type }) => {
+const KeywordList = ({ title, keywords, type, showCopyAll = false }) => {
   if (!keywords || keywords.length === 0) {
     return null;
   }
 
   return (
     <div>
-      <h3 className="mb-2 font-semibold">{title}</h3>
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="font-semibold">{title}</h3>
+        {showCopyAll && keywords.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              const text = keywords.join(", ");
+              navigator.clipboard.writeText(text).catch(() => undefined);
+            }}
+            className="text-xs font-medium text-indigo-600 hover:underline"
+          >
+            Copy all
+          </button>
+        )}
+      </div>
       <div className="flex flex-wrap gap-2">
         {keywords.map((word) => (
           <span

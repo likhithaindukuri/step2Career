@@ -10,7 +10,11 @@ public class AIResponseParser {
 
   private final ObjectMapper objectMapper = new ObjectMapper();
 
-  public ATSResponse parseATSResponse(String rawAIResponse) {
+  public ATSResponse parseATSResponse(
+    String rawAIResponse,
+    String resumeText,
+    String jobDescription
+  ) {
     try {
       JsonNode root = objectMapper.readTree(rawAIResponse);
 
@@ -28,7 +32,12 @@ public class AIResponseParser {
 
       String cleanedContent = cleanContent(content);
 
-      return objectMapper.readValue(cleanedContent, ATSResponse.class);
+      ATSResponse parsed = objectMapper.readValue(
+        cleanedContent,
+        ATSResponse.class
+      );
+
+      return recomputeKeywordsAndScore(parsed, resumeText);
     } catch (Exception e) {
       return fallbackResponse();
     }
@@ -50,6 +59,62 @@ public class AIResponseParser {
     }
 
     return trimmed;
+  }
+
+  private ATSResponse recomputeKeywordsAndScore(
+    ATSResponse parsed,
+    String resumeText
+  ) {
+    if (resumeText == null) {
+      return parsed;
+    }
+
+    String normalizedResume = normalize(resumeText);
+
+    java.util.Set<String> targetKeywords = new java.util.LinkedHashSet<>();
+
+    if (parsed.getMatchedKeywords() != null) {
+      targetKeywords.addAll(parsed.getMatchedKeywords());
+    }
+    if (parsed.getMissingKeywords() != null) {
+      targetKeywords.addAll(parsed.getMissingKeywords());
+    }
+
+    if (targetKeywords.isEmpty()) {
+      return parsed;
+    }
+
+    java.util.List<String> matched = new java.util.ArrayList<>();
+    java.util.List<String> missing = new java.util.ArrayList<>();
+
+    for (String keyword : targetKeywords) {
+      String normalizedKeyword = normalize(keyword);
+      if (normalizedKeyword.isEmpty()) {
+        continue;
+      }
+      if (normalizedResume.contains(normalizedKeyword)) {
+        matched.add(keyword);
+      } else {
+        missing.add(keyword);
+      }
+    }
+
+    parsed.setMatchedKeywords(matched);
+    parsed.setMissingKeywords(missing);
+
+    int total = matched.size() + missing.size();
+    if (total > 0) {
+      int computedScore = (int) Math.round((matched.size() * 100.0) / total);
+      parsed.setAtsScore(computedScore);
+    }
+
+    return parsed;
+  }
+
+  private String normalize(String value) {
+    String lowerCased = value.toLowerCase();
+    String onlyAlnumAndSpace = lowerCased.replaceAll("[^a-z0-9]+", " ");
+    return onlyAlnumAndSpace.replaceAll("\\s+", " ").trim();
   }
 
   private ATSResponse fallbackResponse() {
