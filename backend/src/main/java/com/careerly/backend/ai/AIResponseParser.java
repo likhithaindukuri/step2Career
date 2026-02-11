@@ -1,6 +1,9 @@
 package com.careerly.backend.ai;
 
+import com.careerly.backend.dto.CareerMatrixResponse;
 import com.careerly.backend.dto.ATSResponse;
+import com.careerly.backend.dto.InterviewQuestionsResponse;
+import com.careerly.backend.dto.ResumeBulletsResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
@@ -40,6 +43,93 @@ public class AIResponseParser {
       return recomputeKeywordsAndScore(parsed, resumeText);
     } catch (Exception e) {
       return fallbackResponse();
+    }
+  }
+
+  public ResumeBulletsResponse parseResumeBulletsResponse(
+    String rawAIResponse
+  ) {
+    try {
+      JsonNode root = objectMapper.readTree(rawAIResponse);
+
+      JsonNode choicesNode = root.path("choices");
+      if (!choicesNode.isArray() || choicesNode.isEmpty()) {
+        return new ResumeBulletsResponse();
+      }
+
+      String content =
+        choicesNode
+          .get(0)
+          .path("message")
+          .path("content")
+          .asText();
+
+      String cleanedContent = cleanContent(content);
+
+      return objectMapper.readValue(
+        cleanedContent,
+        ResumeBulletsResponse.class
+      );
+    } catch (Exception exception) {
+      return new ResumeBulletsResponse();
+    }
+  }
+
+  public InterviewQuestionsResponse parseInterviewQuestionsResponse(
+    String rawAIResponse
+  ) {
+    try {
+      JsonNode root = objectMapper.readTree(rawAIResponse);
+
+      JsonNode choicesNode = root.path("choices");
+      if (!choicesNode.isArray() || choicesNode.isEmpty()) {
+        return new InterviewQuestionsResponse();
+      }
+
+      String content =
+        choicesNode
+          .get(0)
+          .path("message")
+          .path("content")
+          .asText();
+
+      String cleanedContent = cleanContent(content);
+
+      return objectMapper.readValue(
+        cleanedContent,
+        InterviewQuestionsResponse.class
+      );
+    } catch (Exception exception) {
+      return new InterviewQuestionsResponse();
+    }
+  }
+
+  public CareerMatrixResponse parseCareerMatrixResponse(
+    String rawAIResponse
+  ) {
+    try {
+      JsonNode root = objectMapper.readTree(rawAIResponse);
+
+      JsonNode choicesNode = root.path("choices");
+      if (!choicesNode.isArray() || choicesNode.isEmpty()) {
+        return new CareerMatrixResponse();
+      }
+
+      String content =
+        choicesNode
+          .get(0)
+          .path("message")
+          .path("content")
+          .asText();
+
+      String cleanedContent = cleanContent(content);
+
+      return objectMapper.readValue(
+        cleanedContent,
+        CareerMatrixResponse.class
+      );
+    } catch (Exception exception) {
+      return new CareerMatrixResponse();
     }
   }
 
