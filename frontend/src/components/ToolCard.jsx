@@ -1,30 +1,30 @@
 import { Link } from "react-router-dom";
+import ToolIcon from "./ToolIcon";
 
-const ToolCard = ({ cta, description, id, title }) => {
-  const path =
-    id === 1
-      ? "/tools/ats"
-      : id === 2
-        ? "/tools/resume-bullets"
-        : id === 3
-          ? "/tools/interview-questions"
-          : "/tools/career-matrix";
+const pathById = {
+  1: "/tools/ats",
+  2: "/tools/resume-bullets",
+  3: "/tools/interview-questions",
+  4: "/tools/career-matrix",
+};
+
+const ToolCard = ({ cta, description, icon, id, title }) => {
+  const path = pathById[id] || "/tools";
 
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm transition hover:shadow-md">
-      <h3 className="mb-3 text-xl font-semibold text-gray-900">
-        {title}
-      </h3>
-      <p className="mb-6 leading-relaxed text-gray-600">
-        {description}
-      </p>
-      <Link
-        to={path}
-        className="font-medium text-indigo-600 hover:underline"
-      >
+    <Link
+      to={path}
+      className="flex flex-col rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
+    >
+      <div className="mb-4">
+        <ToolIcon name={icon} />
+      </div>
+      <h3 className="mb-2 text-xl font-semibold text-gray-900">{title}</h3>
+      <p className="mb-6 flex-1 leading-relaxed text-gray-600">{description}</p>
+      <span className="font-medium text-indigo-600 hover:underline">
         {cta} →
-      </Link>
-    </div>
+      </span>
+    </Link>
   );
 };
 

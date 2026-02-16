@@ -1,31 +1,34 @@
 export const tools = [
-    {
-      id: 1,
-      title: "ATS Keyword Matcher",
-      description:
-        "Understand why your resume gets rejected. See missing keywords and how well your resume matches a job description.",
-      cta: "Check ATS Match"
-    },
-    {
-      id: 2,
-      title: "Resume Bullet Point Generator",
-      description:
-        "Turn weak resume points into impactful, results-driven bullet points that recruiters actually notice.",
-      cta: "Improve Resume"
-    },
-    {
-      id: 3,
-      title: "Interview Question Generator",
-      description:
-        "Get role-specific interview questions based on your resume and the job you are applying for.",
-      cta: "Practice Interview"
-    },
-    {
-      id: 4,
-      title: "Career Matrix",
-      description:
-        "Visualize career paths, required skills, and what you need to learn next to move forward.",
-      cta: "Explore Career Path"
-    }
-  ];
-  
+  {
+    id: 1,
+    title: "ATS Keyword Matcher",
+    description:
+      "Find out exactly why your resume is getting rejected. Identify missing keywords and improve your chances of getting shortlisted.",
+    cta: "Open Tool",
+    icon: "ats",
+  },
+  {
+    id: 2,
+    title: "Resume Bullet Point Generator",
+    description:
+      "Transform weak resume points into strong, professional bullet points that attract recruiters.",
+    cta: "Open Tool",
+    icon: "resume",
+  },
+  {
+    id: 3,
+    title: "Interview Question Generator",
+    description:
+      "Practice real interview questions tailored to your resume and target job role.",
+    cta: "Open Tool",
+    icon: "interview",
+  },
+  {
+    id: 4,
+    title: "Career Matrix",
+    description:
+      "See the complete roadmap for your target role — skills, tools, and steps required to reach it.",
+    cta: "Open Tool",
+    icon: "career",
+  },
+];
