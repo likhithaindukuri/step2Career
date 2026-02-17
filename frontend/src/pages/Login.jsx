@@ -6,23 +6,31 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/tools";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!email.trim() || !password) {
       setError("Please enter email and password.");
       return;
     }
-    const success = login(email.trim(), password);
-    if (success) {
+    try {
+      setLoading(true);
+      await login(email.trim(), password);
       navigate(redirect, { replace: true });
-    } else {
-      setError("Invalid email or password. Sign up if you don't have an account.");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Invalid email or password. Sign up if you don't have an account."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,10 +71,11 @@ const Login = () => {
             />
           </div>
           <button
-            className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600"
+            className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={loading}
             type="submit"
           >
-            Log in
+            {loading ? "Logging in..." : "Log in"}
           </button>
         </form>
         <p className="mt-6 text-center text-gray-600">

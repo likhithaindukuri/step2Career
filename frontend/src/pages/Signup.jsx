@@ -7,12 +7,13 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get("redirect") || "/tools";
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!name.trim()) {
@@ -27,8 +28,19 @@ const Signup = () => {
       setError("Password must be at least 6 characters.");
       return;
     }
-    signup(name.trim(), email.trim(), password);
-    navigate(redirect, { replace: true });
+    try {
+      setLoading(true);
+      await signup(name.trim(), email.trim(), password);
+      navigate(redirect, { replace: true });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "We could not create your account. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -82,10 +94,11 @@ const Signup = () => {
             />
           </div>
           <button
-            className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600"
+            className="w-full rounded-lg bg-amber-500 py-3 font-medium text-white hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={loading}
             type="submit"
           >
-            Sign up
+            {loading ? "Creating account..." : "Sign up"}
           </button>
         </form>
         <p className="mt-6 text-center text-gray-600">

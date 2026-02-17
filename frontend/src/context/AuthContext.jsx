@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useState } from "react";
 
 const AUTH_KEY = "step2career_user";
+const API_BASE_URL = "http://localhost:8081";
 
 const AuthContext = createContext(null);
 
@@ -14,24 +15,51 @@ export function AuthProvider({ children }) {
     }
   });
 
-  const login = useCallback((email, password) => {
-    const stored = localStorage.getItem(AUTH_KEY);
-    if (stored) {
-      const data = JSON.parse(stored);
-      if (data.email === email && data.password === password) {
-        setUser({ name: data.name, email: data.email });
-        return true;
-      }
-    }
-    return false;
+  const setAndPersistUser = useCallback((authResponse) => {
+    const safeUser = {
+      id: authResponse.id,
+      name: authResponse.name,
+      email: authResponse.email,
+    };
+    localStorage.setItem(AUTH_KEY, JSON.stringify(safeUser));
+    setUser(safeUser);
   }, []);
 
-  const signup = useCallback((name, email, password) => {
-    const newUser = { name, email, password };
-    localStorage.setItem(AUTH_KEY, JSON.stringify(newUser));
-    setUser({ name, email });
-    return true;
-  }, []);
+  const login = useCallback(async (email, password) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const message =
+        (await response.text()) ||
+        "We could not log you in. Please check your details and try again.";
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+    setAndPersistUser(data);
+  }, [setAndPersistUser]);
+
+  const signup = useCallback(async (name, email, password) => {
+    const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    if (!response.ok) {
+      const message =
+        (await response.text()) ||
+        "We could not create your account. Please try again.";
+      throw new Error(message);
+    }
+
+    const data = await response.json();
+    setAndPersistUser(data);
+  }, [setAndPersistUser]);
 
   const logout = useCallback(() => {
     setUser(null);
